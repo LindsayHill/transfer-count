@@ -1,4 +1,4 @@
-# transferCount.py - produces Google Chart showing APNIC IPv4 Transfers
+# transfer_count.py - produces Google Chart showing APNIC IPv4 Transfers
 
 This script generates an HTML page containing a Google Chart for all APNIC ipv4 transfers.
 
