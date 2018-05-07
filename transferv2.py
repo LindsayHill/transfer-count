@@ -24,7 +24,7 @@ f = opener.open(url)
 raw_data = f.readlines()
 
 
-output = open('apnic_transfers.html', 'w')
+output = open('apnic_transfers.csv', 'w')
 
 for line in raw_data:
     a_check = re.search('^ipv4\|', line)
@@ -48,68 +48,9 @@ for missing_month in missing_months:
     xfers_by_month[xfer_date] = 0
     prefixes_by_month[xfer_date] = 0
 
-pre_table = '''
-<html>
-<head>
-</head>
-<body>
-<script type="text/javascript" src="https://www.google.com/jsapi"></script>
-<script type="text/javascript">
-google.load("visualization", "1.1", {packages: ["corechart"]});
-google.setOnLoadCallback(drawChart);
-function drawChart() {
-var data = new google.visualization.DataTable();
-data.addColumn("datetime", "Year/Month");
-data.addColumn("number", "Transactions");
-data.addColumn("number", "Prefixes (/24s)");
-data.addRows([
-'''
-output.write('%s' % (pre_table))
-
 for month in sorted(xfers_by_month.keys()):
-    output.write('[new Date(%s000),%s,%s],\n' %
-                 (month.strftime('%s'),
+    output.write('%s,%s,%s\n' %
+                 (month.strftime('%B %Y'),
                   xfers_by_month[month], prefixes_by_month[month]))
-post_table = '''
-]);
-var options = {
-title: "APNIC Transfers per month",
-hAxis: {
-format: "MMM yyyy",
-gridlines: {count: "-1"},
-},
-seriesType: "bars",
-series: {
-0: {targetAxisIndex: 0, type: "line"},
-1: {targetAxisIndex: 1, type: "bars"},
-},
-vAxes: {
-0: {title: "Transactions", side: "left"},
-1: {title: "Prefixes (/24s)", side: "right"},
-},
-};
-var chart = new google.visualization.ComboChart(document.getElementById("ch"));
-var date_formatter = new google.visualization.DateFormat({
-pattern: "MMM yyyy"
-});
-date_formatter.format(data, 0);
-chart.draw(data, options);
-function resizeHandler () {
-chart.draw(data, options);
-}
-if (window.addEventListener) {
-window.addEventListener("resize", resizeHandler, false);
-}
-else if (window.attachEvent) {
-window.attachEvent("onresize", resizeHandler);
-}
-}
-</script>
-<div STYLE="min-height: 500px" id="ch"></div>
-</body>
-</html>
-'''
-
-output.write('%s' % (post_table))
 
 output.close()
